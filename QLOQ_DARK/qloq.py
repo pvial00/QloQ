@@ -34,24 +34,34 @@ def testencrypt(pk, sk, mod):
             return False
     return False
 
+#def genBasePrimes(psize):
+#    p = number.getPrime(psize)
+#    q = number.getPrime(psize)
+#    while q == p:
+#        q = number.getPrime(psize)
+#    return p, q
+
 def genBasePrimes(psize):
     p = number.getPrime(psize)
     q = number.getPrime(psize)
     while q == p:
         q = number.getPrime(psize)
-    return p, q
+    r = number.getPrime(psize)
+    while r == q or r == p:
+        r = number.getPrime(psize)
+    return p, q, r
         
 
 
 def keygen():
     good = 0
-    psize = 256
+    psize = 512
     while good != 1:
-        p, q = genBasePrimes(psize)
-        C = p % 2
-        K = q % 2
-        n = ((p /2) * (q / 2)) + C + K
-        t = ((p - 1) * (q - 1))
+        p, q, r = genBasePrimes(psize)
+        C = p % q
+        K = q % p
+        n = ((((p + K) / (K+1)) * ((q+C) / (C+1))) * p)
+        t = ((p - 1) * (q - 1)) 
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
         while g != 1:

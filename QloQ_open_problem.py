@@ -35,11 +35,18 @@ def testencrypt(pk, sk, mod):
             return False
     return Falses
 
+#def genBasePrimes(psize):
+#    p = number.getPrime(psize)
+#    q = number.getPrime(psize)
+#    while q == p:
+#        q = number.getPrime(psize)
+#    return p, q
+
 def genBasePrimes(psize):
-    p = number.getPrime(psize)
-    q = number.getPrime(psize)
+    p = number.getRandomNBitInteger(psize)
+    q = number.getRandomNBitInteger(psize)
     while q == p:
-        q = number.getPrime(psize)
+        q = number.getRandomNBitInteger(psize)
     return p, q
 
 def keygen():
@@ -47,13 +54,11 @@ def keygen():
     psize = 32
     o = 2
     while good != 1:
-        C = number.getPrime(psize)
-        #p, q = genBasePrimes(psize)
-        p = 241
-        q = 149
-        rm1 = p % 2
-        rm2 = q % 2
-        n = ((p /2) * (q / 2)) + rm1 + rm2
+        p, q = genBasePrimes(psize)
+        k = number.getPrime(psize)
+        C = p % q
+        K = q % p
+        n = ((((p + K) / (K+1)) * ((q+C) / (C+1))) * p)
         t = ((p - 1) * (q - 1))
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
@@ -66,13 +71,13 @@ def keygen():
         if pk != None:
             if testencrypt(pk, sk, n):
                 good = 1
-    return sk, pk, n, p, q, t
+    return sk, pk, n, p, q, t, k
 
 #msg = "A"
 #m = number.bytes_to_long(msg)
-m = 12
+m = 65
 print m
-sk, pk, mod, p, q, t =  keygen()
+sk, pk, mod, p, q, t, k =  keygen()
 print sk, pk, mod
 ctxt = encrypt(m, pk, mod)
 print ctxt
@@ -120,16 +125,26 @@ print "mod mod Q"
 print mod % q
 print "mod mod T"
 print mod % t
+print "mod mod k"
+print mod % k
 print "Solve with P and Q but the question is how to identify P and Q"
 ps = ((p - 1) * (q - 1))
 sk2 = number.inverse(pk, ps)
 print sk2
 print decrypt(ctxt, sk2, mod)
 print "p, q"
-print p, q
+print p, q, k
 print primes
+print "This should always decrypt"
+sk2 = number.inverse(pk, t)
+print sk2
+print decrypt(ctxt, sk2, mod)
+
 
 print "Crack"
-s = (p - 1)
+s = ((k - 1))
+print s, t
+s = ((mod) * 2) 
+#s = (((p - 1) * mod) * ((q - 1) * mod))
 sk2 = number.inverse(pk, s)
 print decrypt(ctxt, sk2, mod)
