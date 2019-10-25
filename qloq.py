@@ -48,11 +48,10 @@ def keygen():
     psize = 64
     o = 2
     while good != 1:
-        C = number.getPrime(psize)
         p, q = genBasePrimes(psize)
-        rm1 = p % 2
-        rm2 = q % 2
-        n = ((p /2) * (q / 2)) + rm1 + rm2
+        C = p % 2
+        K = q % 2
+        n = ((p /2) * (q / 2)) + C + K
         t = ((p - 1) * (q - 1))
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
