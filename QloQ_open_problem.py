@@ -51,7 +51,7 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 8
+    psize = 512
     while good != 1:
         p, q = genBasePrimes(psize)
         a = p * q
@@ -62,7 +62,7 @@ def keygen():
         J = (C+K+G+H) + 1
 
         t = ((p - 1) * (q - 1))
-        n = (((((p + G) / (G+1)) * ((q+H) / (H+1)))) * ((p + (G+H+1))) % (G+H) *((q / 2) + 1))  / (J-p-q)
+        n = ((p * q) / (G+H)) * ((K/G) + (G/H))
         s = (t % ((p - 1) * (q - 1) * G * H * K * C))
         pk = (number.getRandomRange(1, s))
         g = number.GCD(pk, s)
@@ -151,8 +151,6 @@ print "Crack"
 s = ((p - 0))
 sk2 = number.inverse(pk, s)
 print decrypt(ctxt, sk2, mod)
-print "Reddit santiy check"
-s = ((mod) * 2) 
 print "Solve with P and Q but the question is how to identify P and Q"
 ps = ((p - 1) * (q - 1))
 sk2 = number.inverse(pk, ps)
