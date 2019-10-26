@@ -51,15 +51,21 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 128
+    psize = 8
     o = 2
     while good != 1:
         p, q = genBasePrimes(psize)
-        k = number.getPrime(psize)
+        l, m = genBasePrimes(psize)
         C = p % q
         K = q % p
-        n = ((((p + K) / (K+1)) * ((q+C) / (C+1)))) * ((p + (K+C+1))) % (K+C) * ((q / 2) + 1)
-        t = ((p - 1) * (q - 1))
+
+        U = l % m
+        V = m % l
+        
+        a = (((((p + K) / (K+1)) * ((q+C) / (C+1)))) * ((p + (K+C+1))) % (K+C) *((q / 2) + 1))
+        b = (((((l + K) / (U+1)) * ((m+V) / (V+1)))) * ((l + (U+V+1))) % (U+V) *((m / 2) + 1))
+        n = (((b + a) / (C + K + U + V + 1)) + 1) * (l * m)
+        t = ((l - 1) * (m - 1))
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
         while g != 1:
@@ -71,19 +77,19 @@ def keygen():
         if pk != None:
             if testencrypt(pk, sk, n):
                 good = 1
-    return sk, pk, n, p, q, t, K
+    return sk, pk, n, p, q, l, m, C, K, U, V, t
 
 #msg = "A"
 #m = number.bytes_to_long(msg)
-m = 65
-print m
-sk, pk, mod, p, q, t, k =  keygen()
+msg = 65
+print msg
+sk, pk, mod, p, q, l, m, C, K, U, V, t =  keygen()
 print sk, pk, mod
-ctxt = encrypt(m, pk, mod)
+ctxt = encrypt(msg, pk, mod)
 print ctxt
 ptxt = decrypt(ctxt, sk, mod)
 print ptxt
-if ptxt != m:
+if ptxt != msg:
     print "Key is broken"
     exit(1)
 
@@ -125,15 +131,25 @@ print "mod mod Q"
 print mod % q
 print "mod mod T"
 print mod % t
-print "mod mod k"
-print mod % k
-print "Solve with P and Q but the question is how to identify P and Q"
-ps = ((p - 1) * (q - 1))
+print "mod mod L"
+print mod % l
+print "mod mod M"
+print mod % m
+print "mod mod C"
+print mod % C
+print "mod mod K"
+print mod % K
+print "mod mod U"
+print mod % U
+print "mod mod V"
+print mod % U
+print "Solve with L and M but the question is how to identify P and Q"
+ps = ((l - 1) * (m - 1))
 sk2 = number.inverse(pk, ps)
 print sk2
 print decrypt(ctxt, sk2, mod)
 print "p, q"
-print p, q, k
+print p, q, l, m
 print primes
 print "This should always decrypt"
 sk2 = number.inverse(pk, t)
@@ -142,7 +158,27 @@ print decrypt(ctxt, sk2, mod)
 
 
 print "Crack"
-s = ((p - 1))
+s = ((p - 0))
+sk2 = number.inverse(pk, s)
+print decrypt(ctxt, sk2, mod)
+print "Reddit santiy check"
+s = ((mod) * 2) 
+print "Solve with P and Q but the question is how to identify P and Q"
+ps = ((p - 1) * (q - 1))
+sk2 = number.inverse(pk, ps)
+print sk2
+print decrypt(ctxt, sk2, mod)
+print "p, q, l, m, C, K, U, V"
+print p, q, l, m, C, K, U, V
+print primes
+print "This should always decrypt"
+sk2 = number.inverse(pk, t)
+print sk2
+print decrypt(ctxt, sk2, mod)
+
+
+print "Crack"
+s = ((p - 0))
 sk2 = number.inverse(pk, s)
 print decrypt(ctxt, sk2, mod)
 print "Reddit santiy check"
