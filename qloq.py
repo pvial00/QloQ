@@ -55,7 +55,7 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 
+    psize = 128
     while good != 1:
         p, q, r = genBasePrimes(psize)
         C = p % q
