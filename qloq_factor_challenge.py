@@ -14,10 +14,11 @@ def fermat(n):
 
 
 # Crack the modulus and find the secret key
-p = 157
-q = 181
-pk = 17531
-n = 5774
+p = 40237
+q = 42923
+sk = 295174267
+pk = 477071467
+n = 80474
 print "Hand selected primes for P and Q"
 print p, q
 print "Modulus", n

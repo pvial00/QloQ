@@ -62,7 +62,7 @@ def keygen():
         J = (C+K+G+H) + 1
 
         t = ((p - 1) * (q - 1))
-        n = ((p * q) / (G+H)) * ((K/G) + (G/H))
+        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + p)
         s = (t % ((p - 1) * (q - 1) * G * H * K * C))
         pk = (number.getRandomRange(1, s))
         g = number.GCD(pk, s)
