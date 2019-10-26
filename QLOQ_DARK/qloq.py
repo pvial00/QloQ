@@ -52,7 +52,7 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 512
+    psize = 4096
     while good != 1:
         p, q = genBasePrimes(psize)
         a = p * q
@@ -63,7 +63,7 @@ def keygen():
         J = (C+K+G+H) + 1
 
         t = ((p - 1) * (q - 1))
-        n = ((p * q) / (G+H)) * ((K/G) + (G/H))
+        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + p)
         s = (t % ((p - 1) * (q - 1) * G * H * K * C))
         pk = (number.getRandomRange(1, s))
         g = number.GCD(pk, s)
