@@ -57,8 +57,7 @@ def keygen():
         p, q = genBasePrimes(psize)
         C = p % q
         K = q % p
-        n = (((((p + K) / (K+1)) * ((q+C) / (C+1)))) * ((p + (K+C+1))) % (K+C) *
-((q / 2) + 1))
+        n = (((((p + K) / (K+1)) * ((q+C) / (C+1)))) * ((p + (K+C+1))) % (K+C) * ((q / 2) + 1))
         t = ((p - 1) * (q - 1)) 
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
