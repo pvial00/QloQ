@@ -2,4 +2,4 @@
 
 Q'loQ, pronounced cloak is the Klingon High Command's Public Key encryption algorithm adopted from the Human algorithm RSA.
 
-Can you uncloak P and Q?
+# Don't use this use HoD
