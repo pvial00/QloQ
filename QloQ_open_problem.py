@@ -148,7 +148,11 @@ print decrypt(ctxt, sk2, mod)
 
 
 print "Crack"
-s = ((p - 0))
+if primes[len(primes)-1] == mod:
+    primes.pop()
+p2 = primes.pop()
+q2 = mod /p2
+s = ((p2 - 1) * (q2 - 1))
 sk2 = number.inverse(pk, s)
 print decrypt(ctxt, sk2, mod)
 print "Solve with P and Q but the question is how to identify P and Q"
