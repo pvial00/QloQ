@@ -55,12 +55,13 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 512
+    psize = 
     while good != 1:
         p, q, r = genBasePrimes(psize)
         C = p % q
         K = q % p
-        n = ((((p + K) / (K+1)) * ((q+C) / (C+1))) * p)
+        n = ((((p + K) / (K+1)) * ((q+C) / (C+1)))) * ((p + (K+C+1))) % (K+C) *
+((q / 2) + 1)
         t = ((p - 1) * (q - 1)) 
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)

@@ -51,14 +51,14 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 32
+    psize = 128
     o = 2
     while good != 1:
         p, q = genBasePrimes(psize)
         k = number.getPrime(psize)
         C = p % q
         K = q % p
-        n = ((((p + K) / (K+1)) * ((q+C) / (C+1))) * p)
+        n = ((((p + K) / (K+1)) * ((q+C) / (C+1)))) * ((p + (K+C+1))) % (K+C) * ((q / 2) + 1)
         t = ((p - 1) * (q - 1))
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
@@ -71,7 +71,7 @@ def keygen():
         if pk != None:
             if testencrypt(pk, sk, n):
                 good = 1
-    return sk, pk, n, p, q, t, k
+    return sk, pk, n, p, q, t, K
 
 #msg = "A"
 #m = number.bytes_to_long(msg)
@@ -142,8 +142,10 @@ print decrypt(ctxt, sk2, mod)
 
 
 print "Crack"
-s = ((k - 1))
-print s, t
+s = ((p - 1))
+sk2 = number.inverse(pk, s)
+print decrypt(ctxt, sk2, mod)
+print "Reddit santiy check"
 s = ((mod) * 2) 
 #s = (((p - 1) * mod) * ((q - 1) * mod))
 sk2 = number.inverse(pk, s)
