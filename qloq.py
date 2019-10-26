@@ -52,21 +52,27 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 8
+    psize = 512
     while good != 1:
         p, q = genBasePrimes(psize)
+        a = p * q
         C = p % q
         K = q % p
-        n = (((((p + K) / (K+1)) * ((q+C) / (C+1)))) * ((p + (K+C+1))) % (K+C) *((q / 2) + 1))
+        G = (q % p) % p
+        H = (p % q) % q
+        J = (C+K+G+H) + 1
+
         t = ((p - 1) * (q - 1))
-        pk = (number.getRandomRange(1, t))
-        g = number.GCD(pk, t)
+        n = (((((p + G) / (G+1)) * ((q+H) / (H+1)))) * ((p + (G+H+1))) % (G+H) *((q / 2) + 1))  / (J-p-q)
+        s = (t % ((p - 1) * (q - 1) * G * H * K * C))
+        pk = (number.getRandomRange(1, s))
+        g = number.GCD(pk, s)
         while g != 1:
-            pk = (number.getRandomRange(1, t))
-            g = number.GCD(pk, t)
+            pk = (number.getRandomRange(1, s))
+            g = number.GCD(pk, s)
             if g == 1:
                 break
-        sk = number.inverse(pk, t)
+        sk = number.inverse(pk, s)
         if pk != None:
             if testencrypt(pk, sk, n):
                 good = 1
