@@ -55,17 +55,11 @@ def keygen():
     o = 2
     while good != 1:
         p, q = genBasePrimes(psize)
-        l, m = genBasePrimes(psize)
         C = p % q
         K = q % p
 
-        U = l % m
-        V = m % l
-        
-        a = (((((p + K) / (K+1)) * ((q+C) / (C+1)))) * ((p + (K+C+1))) % (K+C) *((q / 2) + 1))
-        b = (((((l + K) / (U+1)) * ((m+V) / (V+1)))) * ((l + (U+V+1))) % (U+V) *((m / 2) + 1))
-        n = (((b + a) / (C + K + U + V + 1)) + 1) * (l * m)
-        t = ((l - 1) * (m - 1))
+        n = (((((p + K) / (K+1)) * ((q+C) / (C+1)))) * ((p + (K+C+1))) % (K+C) *((q / 2) + 1))
+        t = ((p - 1) * (q - 1))
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
         while g != 1:
@@ -77,13 +71,13 @@ def keygen():
         if pk != None:
             if testencrypt(pk, sk, n):
                 good = 1
-    return sk, pk, n, p, q, l, m, C, K, U, V, t
+    return sk, pk, n, p, q, C, K, t
 
 #msg = "A"
 #m = number.bytes_to_long(msg)
 msg = 65
 print msg
-sk, pk, mod, p, q, l, m, C, K, U, V, t =  keygen()
+sk, pk, mod, p, q, C, K, t =  keygen()
 print sk, pk, mod
 ctxt = encrypt(msg, pk, mod)
 print ctxt
@@ -131,25 +125,17 @@ print "mod mod Q"
 print mod % q
 print "mod mod T"
 print mod % t
-print "mod mod L"
-print mod % l
-print "mod mod M"
-print mod % m
 print "mod mod C"
 print mod % C
 print "mod mod K"
 print mod % K
-print "mod mod U"
-print mod % U
-print "mod mod V"
-print mod % U
-print "Solve with L and M but the question is how to identify P and Q"
-ps = ((l - 1) * (m - 1))
+print "Solve with P and Q but the question is how to identify P and Q"
+ps = ((p - 1) * (q - 1))
 sk2 = number.inverse(pk, ps)
 print sk2
 print decrypt(ctxt, sk2, mod)
 print "p, q"
-print p, q, l, m
+print p, q
 print primes
 print "This should always decrypt"
 sk2 = number.inverse(pk, t)
@@ -168,8 +154,8 @@ ps = ((p - 1) * (q - 1))
 sk2 = number.inverse(pk, ps)
 print sk2
 print decrypt(ctxt, sk2, mod)
-print "p, q, l, m, C, K, U, V"
-print p, q, l, m, C, K, U, V
+print "p, q, C, K"
+print p, q, C, K
 print primes
 print "This should always decrypt"
 sk2 = number.inverse(pk, t)
