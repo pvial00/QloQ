@@ -8,7 +8,7 @@ from Crypto.Util import number
 # Made to work with 64 bit keys
 keylen = 32
 noncelen = 16
-Klen = 64
+Klen = 257
 mode = sys.argv[1]
 infile = sys.argv[2]
 outfile = sys.argv[3]
