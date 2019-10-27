@@ -5,6 +5,20 @@ import math
 
 # requires pycrypto
 
+def fermat(n):
+    from math import sqrt
+    x = long(sqrt(n)) + 1
+    y = long(sqrt(x**2 - n))
+    while True:
+        w = x**2 - n - y**2
+        if w == 0:
+            break
+        if w > 0:
+            y += 1
+        else:
+            x += 1
+    return x+y
+
 def encrypt(ptxt, pk, mod):
     return pow(ptxt, pk, mod)
 
@@ -47,44 +61,37 @@ def genBasePrimes(psize):
     q = number.getPrime(psize)
     while q == p:
         q = number.getPrime(psize)
-    m = number.getPrime(psize)
-    while m == p or m == q:
-        m = number.getPrime(psize)
-    return p, q, m
+    return p, q
 
 def keygen():
     good = 0
-    psize = 8
+    psize = 128
     while good != 1:
-        p, q, m = genBasePrimes(psize)
-        a = p * q
-        C = p % q
-        K = q % p
-        G = (q % p) % p
-        H = (p % q) % q
-        J = (C+K+G+H) + 1
-
-        t = ((p - 1) * (q - 1))
-        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) + (p - 1) + (G - H)
-        s = (t % ((p - 1) * G * H * K * C * (m - 1)))
-        pk = (number.getRandomRange(1, s))
-        g = number.GCD(pk, s)
+        p, q = genBasePrimes(psize)
+        C = (p % q) 
+        K = (q % p) 
+        G = (p % q) +  (p/q)
+        H = (q % p) + (((q/p)) + 0) 
+        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) 
+        t = ((p - 1) * (q - 1)  * p)
+        pk = (number.getRandomRange(1, t))
+        g = number.GCD(pk, t)
         while g != 1:
-            pk = (number.getRandomRange(1, s))
-            g = number.GCD(pk, s)
+            pk = (number.getRandomRange(1, t))
+            g = number.GCD(pk, t)
             if g == 1:
                 break
-        sk = number.inverse(pk, s)
+        sk = number.inverse(pk, t)
         if pk != None:
             if testencrypt(pk, sk, n):
                 good = 1
-    return sk, pk, n, p, q, C, K, t, m
+    return sk, pk, n, p, q, C, K, t
 
 #msg = "A"
 #m = number.bytes_to_long(msg)
 msg = 65
 print msg
-sk, pk, mod, p, q, C, K, t, m =  keygen()
+sk, pk, mod, p, q, C, K, t =  keygen()
 print sk, pk, mod
 ctxt = encrypt(msg, pk, mod)
 print ctxt
@@ -136,8 +143,6 @@ print "mod mod C"
 print mod % C
 print "mod mod K"
 print mod % K
-print "mod mod M"
-print mod % m
 print "Solve with P and Q but the question is how to identify P and Q"
 ps = ((p - 1) * (q - 1))
 sk2 = number.inverse(pk, ps)
@@ -152,14 +157,17 @@ print sk2
 print decrypt(ctxt, sk2, mod)
 
 
-print "Crack"
+print "Crack from primes"
 if primes[len(primes)-1] == mod:
     primes.pop()
 p2 = primes.pop()
 q2 = mod /p2
 s = ((p2 - 1) * (q2 - 1))
 sk2 = number.inverse(pk, s)
-print decrypt(ctxt, sk2, mod)
+tmp = decrypt(ctxt, sk2, mod)
+if tmp == msg:
+    print "Cracked", tmp
+    exit(0)
 print "Solve with P and Q but the question is how to identify P and Q"
 ps = ((p - 1) * (q - 1))
 sk2 = number.inverse(pk, ps)
@@ -174,12 +182,32 @@ print sk2
 print decrypt(ctxt, sk2, mod)
 
 
-print "Crack"
-s = ((p - 0))
-sk2 = number.inverse(pk, s)
-print decrypt(ctxt, sk2, mod)
+print "Crack with P"
+sk2 = number.inverse(pk, (p-1))
+tmp = decrypt(ctxt, sk2, mod)
+if tmp == msg:
+    print "Cracked", tmp
+    #exit(0)
+print "Crack with Q"
+sk2 = number.inverse(pk, (q-1))
+tmp = decrypt(ctxt, sk2, mod)
+if tmp == msg:
+    print "Cracked", tmp
+    #exit(0)
 print "Reddit santiy check"
 s = ((mod) * 2) 
 #s = (((p - 1) * mod) * ((q - 1) * mod))
 sk2 = number.inverse(pk, s)
-print decrypt(ctxt, sk2, mod)
+tmp = decrypt(ctxt, sk2, mod)
+if tmp == msg:
+    print "Cracked", tmp
+    #exit(0)
+print "Cracking with Fermat"
+p2 = fermat(mod)
+q2 = mod / p2
+t = ((p2 - 1) * (q2 - 1))
+sk2 = number.inverse(pk, t)
+tmp = decrypt(ctxt, sk2, mod)
+if tmp == msg:
+    print "Cracked", tmp
+    #exit(0)

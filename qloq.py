@@ -1,6 +1,4 @@
-import random
 from Crypto.Util import number
-import math
 
 # requires pycrypto
 
@@ -34,48 +32,38 @@ def testencrypt(pk, sk, mod):
             return False
     return False
 
-#def genBasePrimes(psize):
-#    p = number.getPrime(psize)
-#    q = number.getPrime(psize)
-#    while q == p:
-#        q = number.getPrime(psize)
-#    return p, q
-
 def genBasePrimes(psize):
     p = number.getPrime(psize)
     q = number.getPrime(psize)
     while q == p:
         q = number.getPrime(psize)
-    m = number.getPrime(psize)
-    while m == p or m == q:
-        m = number.getPrime(psize)
-    return p, q, m
-        
-
+    return p, q
 
 def keygen():
     good = 0
     psize = 512
     while good != 1:
-        p, q, m = genBasePrimes(psize)
-        a = p * q
-        C = p % q
-        K = q % p
-        G = (q % p) % p
-        H = (p % q) % q
-        J = (C+K+G+H) + 1
-
-        t = ((p - 1) * (q - 1))
-        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) + (p - 1) + (G - H)
-        s = (t % ((p - 1) * G * H * K * C * (m - 1)))
-        pk = (number.getRandomRange(1, s))
-        g = number.GCD(pk, s)
+        # Generate base primes
+        p, q = genBasePrimes(psize)
+        # Generate cloaking values
+        C = (p % q)
+        K = (q % p)
+        G = (p % q) +  (p/q) 
+        H = (q % p) + (((q/p)))
+        # Cloak the modulus
+        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) 
+        # Reflect the totient
+        t = ((p - 1) * (q - 1)  * p)
+        # Generate the public key
+        pk = (number.getRandomRange(1, t))
+        g = number.GCD(pk, t)
         while g != 1:
-            pk = (number.getRandomRange(1, s))
-            g = number.GCD(pk, s)
+            pk = (number.getRandomRange(1, t))
+            g = number.GCD(pk, t)
             if g == 1:
                 break
-        sk = number.inverse(pk, s)
+        # Generate the secret key
+        sk = number.inverse(pk, t)
         if pk != None:
             if testencrypt(pk, sk, n):
                 good = 1
