@@ -43,17 +43,16 @@ def keygen():
     good = 0
     psize = 512
     while good != 1:
-        # Generate base primes
+        # Generate the base primes
         p, q = genBasePrimes(psize)
-        # Generate cloaking values
-        C = (p % q) + p
-        K = (q % p) + q
-        G = (p % q) +  (p/q) 
+        # Generate the cloaking parameters
+        K = (q % p) 
+        G = (p % q) +  (q/p) 
         H = (q % p) + (((q/p)))
         # Cloak the modulus
-        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) + (q/p)
+        n = (((K+G) * (G+H))) 
         # Reflect the totient
-        t = ((p - 1) * (q - 1)  * p * (G - 1))
+        t = ((p - 1) * (q - 1) * p * K)
         # Generate the public key
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)

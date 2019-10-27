@@ -62,11 +62,11 @@ def keygen():
     while good != 1:
         p, q = genBasePrimes(psize)
         C = (p % q) + p
-        K = (q % p) + q
+        K = (q % p) 
         G = (p % q) +  (q/p) 
         H = (q % p) + (((q/p))) 
-        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) + (q/p)
-        t = ((p - 1) * (q - 1)  * p * (G - 1))
+        n = (((K+G) * (G+H))) 
+        t = ((p - 1) * (q - 1) * p * (K))
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
         while g != 1:
@@ -195,6 +195,19 @@ tmp = decrypt(ctxt, sk2, mod)
 if tmp == msg:
     print "Cracked", tmp
     #exit(0)
+print "Crack with P"
+sk2 = number.inverse(pk, (p))
+tmp = decrypt(ctxt, sk2, mod)
+if tmp == msg:
+    print "Cracked", tmp
+    #exit(0)
+print "Crack with Q"
+sk2 = number.inverse(pk, (q))
+tmp = decrypt(ctxt, sk2, mod)
+if tmp == msg:
+    print "Cracked", tmp
+    #exit(0)
+
 print "Cracking with Fermat"
 p2 = fermat(mod)
 q2 = mod / p2
@@ -204,3 +217,4 @@ tmp = decrypt(ctxt, sk2, mod)
 if tmp == msg:
     print "Cracked", tmp
     #exit(0)
+
