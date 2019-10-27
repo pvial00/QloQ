@@ -47,13 +47,16 @@ def genBasePrimes(psize):
     q = number.getPrime(psize)
     while q == p:
         q = number.getPrime(psize)
-    return p, q
+    m = number.getPrime(psize)
+    while m == p or m == q:
+        m = number.getPrime(psize)
+    return p, q, m
 
 def keygen():
     good = 0
     psize = 8
     while good != 1:
-        p, q = genBasePrimes(psize)
+        p, q, m = genBasePrimes(psize)
         a = p * q
         C = p % q
         K = q % p
@@ -62,8 +65,8 @@ def keygen():
         J = (C+K+G+H) + 1
 
         t = ((p - 1) * (q - 1))
-        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + p)
-        s = (t % ((p - 1) * (q - 1) * G * H * K * C))
+        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) + (p - 1) + (G - H)
+        s = (t % ((p - 1) * G * H * K * C * (m - 1)))
         pk = (number.getRandomRange(1, s))
         g = number.GCD(pk, s)
         while g != 1:
@@ -75,13 +78,13 @@ def keygen():
         if pk != None:
             if testencrypt(pk, sk, n):
                 good = 1
-    return sk, pk, n, p, q, C, K, t
+    return sk, pk, n, p, q, C, K, t, m
 
 #msg = "A"
 #m = number.bytes_to_long(msg)
 msg = 65
 print msg
-sk, pk, mod, p, q, C, K, t =  keygen()
+sk, pk, mod, p, q, C, K, t, m =  keygen()
 print sk, pk, mod
 ctxt = encrypt(msg, pk, mod)
 print ctxt
@@ -133,6 +136,8 @@ print "mod mod C"
 print mod % C
 print "mod mod K"
 print mod % K
+print "mod mod M"
+print mod % m
 print "Solve with P and Q but the question is how to identify P and Q"
 ps = ((p - 1) * (q - 1))
 sk2 = number.inverse(pk, ps)

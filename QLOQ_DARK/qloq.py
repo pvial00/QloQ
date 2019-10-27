@@ -46,7 +46,10 @@ def genBasePrimes(psize):
     q = number.getPrime(psize)
     while q == p:
         q = number.getPrime(psize)
-    return p, q
+    m = number.getPrime(psize)
+    while m == p or m == q:
+        m = number.getPrime(psize)
+    return p, q, m
         
 
 
@@ -54,7 +57,7 @@ def keygen():
     good = 0
     psize = 512
     while good != 1:
-        p, q = genBasePrimes(psize)
+        p, q, m = genBasePrimes(psize)
         a = p * q
         C = p % q
         K = q % p
@@ -63,8 +66,8 @@ def keygen():
         J = (C+K+G+H) + 1
 
         t = ((p - 1) * (q - 1))
-        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q))
-        s = (t % ((p - 1) * (q - 1) * G * H * K * C))
+        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) + (p - 1) + (G - H)
+        s = (t % ((p - 1) * G * H * K * C * (m - 1)))
         pk = (number.getRandomRange(1, s))
         g = number.GCD(pk, s)
         while g != 1:
