@@ -1,3 +1,5 @@
+from Crypto.Util import number
+
 def fermat(n):
     from math import sqrt
     x = long(sqrt(n)) + 1
@@ -14,13 +16,20 @@ def fermat(n):
 
 
 # Crack the modulus and find the secret key
-p = 40237
-q = 42923
-sk = 295174267
-pk = 477071467
-n = 80474
+p = 41609
+q = 41513
+sk = 436758813
+pk = 1240827701
+n = 18058155
+ctxt = 432020
 print "Hand selected primes for P and Q"
 print p, q
 print "Modulus", n
 print "Factoring with Fermat..."
-print fermat(n)
+q =fermat(n)
+print q
+p = n / q
+t = ((p - 1) * (q - 1))
+sk2 = number.inverse(pk, t)
+print "Crack"
+print pow(ctxt, sk2, n)
