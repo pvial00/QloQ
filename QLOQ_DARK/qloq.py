@@ -46,14 +46,14 @@ def keygen():
         # Generate base primes
         p, q = genBasePrimes(psize)
         # Generate cloaking values
-        C = (p % q)
-        K = (q % p)
+        C = (p % q) + p
+        K = (q % p) + q
         G = (p % q) +  (p/q) 
         H = (q % p) + (((q/p)))
         # Cloak the modulus
-        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) 
+        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) + (q/p)
         # Reflect the totient
-        t = ((p - 1) * (q - 1)  * p)
+        t = ((p - 1) * (q - 1)  * p * (G - 1))
         # Generate the public key
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)

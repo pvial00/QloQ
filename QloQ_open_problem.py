@@ -49,13 +49,6 @@ def testencrypt(pk, sk, mod):
             return False
     return Falses
 
-#def genBasePrimes(psize):
-#    p = number.getPrime(psize)
-#    q = number.getPrime(psize)
-#    while q == p:
-#        q = number.getPrime(psize)
-#    return p, q
-
 def genBasePrimes(psize):
     p = number.getPrime(psize)
     q = number.getPrime(psize)
@@ -65,15 +58,15 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 128
+    psize = 8
     while good != 1:
         p, q = genBasePrimes(psize)
-        C = (p % q) 
-        K = (q % p) 
-        G = (p % q) +  (p/q)
-        H = (q % p) + (((q/p)) + 0) 
-        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) 
-        t = ((p - 1) * (q - 1)  * p)
+        C = (p % q) + p
+        K = (q % p) + q
+        G = (p % q) +  (q/p) 
+        H = (q % p) + (((q/p))) 
+        n = (((p * q) / (G+H)) * ((K/G) + (G/H)) + (p/q)) + (q/p)
+        t = ((p - 1) * (q - 1)  * p * (G - 1))
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
         while g != 1:
