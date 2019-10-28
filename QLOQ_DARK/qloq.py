@@ -30,14 +30,20 @@ def genBasePrimes(psize):
     q = number.getPrime(psize)
     while q == p:
         q = number.getPrime(psize)
-    return p, q
+    a = number.getPrime(psize)
+    while a == p or a == q:
+        a = number.getPrime(psize)
+    b = number.getPrime(psize)
+    while b == p or b == q or b == a:
+        b = number.getPrime(psize)
+    return p, q, a, b
 
 def keygen():
     good = 0
-    psize = 512
+    psize = 8
     while good != 1:
         # Generate base primes
-        p, q = genBasePrimes(psize)
+        p, q, a, b = genBasePrimes(psize)
         # Generate cloaking values
         C = (p % q)
         K = (q % p)
@@ -46,9 +52,9 @@ def keygen():
         # Cloak the cloaking modulus
         M = ((K * G ) * (C+K)/K) + (((p/q) + (q/p))/(K+C))
         # Generate the modulus
-        n = p * q
+        n = a * b
         # Cloak the totient
-        t = ((p - 1) * (q - 1) * p)
+        t = ((p - 1) * (q - 1) * p * (a - 1) * (b - 1))
         # Generate the public key
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
