@@ -2,30 +2,23 @@ from Crypto.Util import number
 
 # requires pycrypto
 
-def encrypt(ptxt, pk, mod):
-    return pow(ptxt, pk, mod)
+def encrypt(ptxt, pk, mod, M):
+    phase1 = pow(ptxt, pk, M)
+    return pow(phase1, pk, mod)
 
-def decrypt(ctxt, sk, mod):
-    return pow(ctxt, sk, mod)
+def decrypt(ctxt, sk, mod, M):
+    phase1 = pow(ctxt, sk, mod)
+    return pow(phase1, sk, M)
 
-def sign(ctxt, sk, mod):
-    return pow(ctxt, sk, mod)
-
-def verify(ptxt, ctxt, pk, mod, s):
-    x = pow(ptxt, pk, mod)
-    if x == ctxt:
-        return True
-    else:
-        return False
+# Signing algorithm TBD
 
 def testencrypt(pk, sk, mod):
-    msg = "012345678901234567890"
     msg = "H"
     m = number.bytes_to_long(msg)
-    ctxt = encrypt(m, pk, mod)
+    ctxt = pow(m, pk, mod)
     if sk != None:
 
-        ptxt = decrypt(ctxt, sk, mod)
+        ptxt = pow(ctxt, sk, mod)
         if ptxt == m:
             return True
         else:
@@ -43,16 +36,19 @@ def keygen():
     good = 0
     psize = 512
     while good != 1:
-        # Generate the base primes
+        # Generate base primes
         p, q = genBasePrimes(psize)
-        # Generate the cloaking parameters
-        K = (q % p) 
-        G = (p % q) +  (q/p) 
-        H = (q % p) + (((q/p)))
-        # Cloak the modulus
-        n = (((K+G) * (G+H))) 
-        # Reflect the totient
-        t = ((p - 1) * (q - 1) * p * K)
+        # Generate cloaking values
+        C = (p % q)
+        K = (q % p)
+        G = (p % q) + (q)
+        H = (p % q) + (p)
+        # Cloak the cloaking modulus
+        M = ((K * G ) * (C+K)/K) + (((p/q) + (q/p))/(K+C))
+        # Generate the modulus
+        n = p * q
+        # Cloak the totient
+        t = ((p - 1) * (q - 1) * p)
         # Generate the public key
         pk = (number.getRandomRange(1, t))
         g = number.GCD(pk, t)
@@ -64,6 +60,6 @@ def keygen():
         # Generate the secret key
         sk = number.inverse(pk, t)
         if pk != None:
-            if testencrypt(pk, sk, n):
+            if testencrypt(pk, sk, M):
                 good = 1
-    return sk, pk, n
+    return sk, pk, n, M
