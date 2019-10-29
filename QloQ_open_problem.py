@@ -121,7 +121,7 @@ print "crack", crack
 
 primes = []
 masks = []
-ceiling = 1757151233
+ceiling = 500000
 start = 1
 inc = 1
 for i in range(start, ceiling, inc):
