@@ -121,8 +121,8 @@ print "crack", crack
 
 primes = []
 masks = []
-ceiling = 500000
-start = 1
+ceiling = crack*2
+start = 2
 inc = 1
 for i in range(start, ceiling, inc):
     try:
@@ -159,6 +159,10 @@ print "mod mod C"
 print mod % C
 print "mod mod K"
 print mod % K
+print "Mask mod U"
+print M % U
+print "Mask mod V"
+print M % V
 print "Solve with P and Q but the question is how to identify P and Q"
 ps = ((p - 1) * (q - 1))
 sk2 = number.inverse(pk, ps)
@@ -173,17 +177,17 @@ print sk2
 print decrypt(ctxt, sk2, mod, M)
 
 
-print "Crack from primes"
-if primes[len(primes)-1] == mod:
-    primes.pop()
-p2 = primes.pop()
-q2 = mod /p2
-s = ((p2 - 1) * (q2 - 1))
-sk2 = number.inverse(pk, s)
-tmp = decrypt(ctxt, sk2, mod, M)
-if tmp == msg:
-    print "Cracked", tmp
-    exit(0)
+#print "Crack from primes"
+#if primes[len(primes)-1] == mod:
+#    primes.pop()
+#p2 = primes.pop()
+#q2 = mod /p2
+#s = ((p2 - 1) * (q2 - 1))
+#sk2 = number.inverse(pk, s)
+#tmp = decrypt(ctxt, sk2, mod, M)
+#if tmp == msg:
+#    print "Cracked", tmp
+#    exit(0)
 print "Solve with P,Q,A,B but the question is how to identify P and Q"
 ps = ((p - 1) * (q - 1) * p * (a - 1) * (b - 1))
 sk2 = number.inverse(pk, ps)
@@ -219,24 +223,24 @@ if tmp == msg:
     print "Cracked", tmp
     #exit(0)
 print "Crack with P"
-sk2 = number.inverse(pk, (p))
+sk2 = number.inverse(pk, (p-1))
 tmp = decrypt(ctxt, sk2, mod, M)
 if tmp == msg:
     print "Cracked", tmp
     #exit(0)
 print "Crack with Q"
-sk2 = number.inverse(pk, (q))
+sk2 = number.inverse(pk, (q-1))
 tmp = decrypt(ctxt, sk2, mod, M)
 if tmp == msg:
     print "Cracked", tmp
 print "Crack with A"
-sk2 = number.inverse(pk, (a))
+sk2 = number.inverse(pk, (a-1))
 tmp = decrypt(ctxt, sk2, mod, M)
 if tmp == msg:
     print "Cracked", tmp
     #exit(0)
 print "Crack with B"
-sk2 = number.inverse(pk, (b))
+sk2 = number.inverse(pk, (b-1))
 tmp = decrypt(ctxt, sk2, mod, M)
 if tmp == msg:
     print "Cracked", tmp
@@ -247,7 +251,8 @@ b2 = mod/ a2
 print a2, b2
 print "Finding cloaked prime in the modulus with Fermat"
 p2 = fermat(mod)
-print p2
+q2 = fermat(mod)
+print p2, q2
 #q2 = mod / p2
 #t = ((p2 - 1) * (q2 - 1))
 #sk2 = number.inverse(pk, t)
