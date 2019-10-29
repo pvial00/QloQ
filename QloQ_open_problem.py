@@ -248,8 +248,8 @@ print "Finding A in the modulus with Fermat"
 a2 = fermat(mod)
 b2 = mod/ a2
 print a2, b2
-print "Finding cloaked prime in the modulus with Fermat"
-p2 = fermat(mod)
+print "Finding cloaked prime in the mask with Fermat"
+p2 = fermat(M)
 q2 = M/p2
 print p2, q2
 #q2 = mod / p2
