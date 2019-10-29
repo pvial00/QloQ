@@ -2,4 +2,4 @@
 
 Q'loQ, pronounced cloak is the Klingon High Command's Public Key encryption algorithm adopted from the Human algorithm ZRSA.
 
-Q'loQ leaves P open to detection but Q it cloaks in shroud of darkness.  Like ZRSA It is resistant to Fermat's theorem.
+Q'loQ leaves P open to detection but Q it cloaks in shroud of darkness.  Like ZRSA It is resistant to Fermat's theorem.  It also introduces the concept of a mask which is a second modulus with which to encrypt with.  The hope is that the second modulus may close to double the encryption while keeping the key sizes the same.

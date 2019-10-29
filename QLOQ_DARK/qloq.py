@@ -10,7 +10,17 @@ def decrypt(ctxt, sk, mod, M):
     phase1 = pow(ctxt, sk, mod)
     return pow(phase1, sk, M)
 
-# Signing algorithm TBD
+def sign(ctxt, sk, mod, M):
+    phase1 = pow(ctxt, sk, M)
+    return pow(phase1, sk, mod)
+
+def verify(ptxt, ctxt, pk, mod, M):
+    phase1 = pow(ptxt, pk, M)
+    x = pow(phase1, pk, mod)
+    if x == ctxt:
+        return True
+    else:
+        return False
 
 def testencrypt(pk, sk, mod):
     msg = "H"
@@ -40,7 +50,7 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 8
+    psize = 512
     while good != 1:
         # Generate base primes
         p, q, a, b = genBasePrimes(psize)
@@ -50,7 +60,10 @@ def keygen():
         G = (p % q) + (q)
         H = (p % q) + (p)
         # Cloak the cloaking modulus
-        M = ((K * G ) * (C+K)/K) + (((p/q) + (q/p))/(K+C))
+        U = K * G 
+        V = ((C+K)/K) + (((p/q) + (q/p))/(K+C))
+        # Generate the mask
+        M = U * V
         # Generate the modulus
         n = a * b
         # Cloak the totient
