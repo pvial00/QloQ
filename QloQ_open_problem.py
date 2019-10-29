@@ -250,14 +250,14 @@ b2 = mod/ a2
 print a2, b2
 print "Finding cloaked prime in the modulus with Fermat"
 p2 = fermat(mod)
-q2 = fermat(mod)
+q2 = M/p2
 print p2, q2
 #q2 = mod / p2
-#t = ((p2 - 1) * (q2 - 1))
-#sk2 = number.inverse(pk, t)
-#tmp = decrypt(ctxt, sk2, mod, M)
-#if tmp == msg:
-#    print "Cracked", tmp
+t = ((p2 - 1) * (q2 - 1) * (a2 - b2))
+sk2 = number.inverse(pk, t)
+tmp = decrypt(ctxt, sk2, mod, M)
+if tmp == msg:
+    print "Cracked", tmp
     #exit(0)
 print primes
 print masks
