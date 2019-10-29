@@ -2,33 +2,33 @@ from Crypto.Util import number
 
 # requires pycrypto
 
-def encrypt(ptxt, pk, mod, M):
+def encrypt(ptxt, pk, n, M):
     phase1 = pow(ptxt, pk, M)
-    return pow(phase1, pk, mod)
+    return pow(phase1, pk, n)
 
-def decrypt(ctxt, sk, mod, M):
-    phase1 = pow(ctxt, sk, mod)
+def decrypt(ctxt, sk, n, M):
+    phase1 = pow(ctxt, sk, n)
     return pow(phase1, sk, M)
 
-def sign(ctxt, sk, mod, M):
+def sign(ctxt, sk, n, M):
     phase1 = pow(ctxt, sk, M)
-    return pow(phase1, sk, mod)
+    return pow(phase1, sk, n)
 
-def verify(ptxt, ctxt, pk, mod, M):
+def verify(ptxt, ctxt, pk, n, M):
     phase1 = pow(ptxt, pk, M)
-    x = pow(phase1, pk, mod)
+    x = pow(phase1, pk, n)
     if x == ctxt:
         return True
     else:
         return False
 
-def testencrypt(pk, sk, mod):
+def testencrypt(pk, sk, n):
     msg = "H"
     m = number.bytes_to_long(msg)
-    ctxt = pow(m, pk, mod)
+    ctxt = pow(m, pk, n)
     if sk != None:
 
-        ptxt = pow(ctxt, sk, mod)
+        ptxt = pow(ctxt, sk, n)
         if ptxt == m:
             return True
         else:
@@ -58,12 +58,13 @@ def keygen():
         C = (p % q)
         K = (q % p)
         G = (p % q) + (q)
-        # Cloak the cloaking modulus
+        H = (p % q) + (p)
+        # Cloak the cloaking nulus
         U = K * G 
         V = ((C+K)/K) + (((p/q) + (q/p))/(K+C))
         # Generate the mask
         M = U * V
-        # Generate the modulus
+        # Generate the nulus
         n = a * b
         # Cloak the totient
         t = ((p - 1) * (q - 1) * p * (a - 1) * (b - 1))
