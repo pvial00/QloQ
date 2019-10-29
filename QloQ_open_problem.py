@@ -77,11 +77,8 @@ def keygen():
         K = (q % p)
         G = (p % q) + (q)
         H = (p % q) + (p)
-        # Cloak the cloaking nulus
-        U = K * G
-        V = ((C+K)/K) + (((p/q) + (q/p))/(K+C))
-        # Generate the mask
-        M = U * V
+        # Generate the cloaking nulus
+        M = ((K * G) * (C+K)/K) + (((p/q) + (q/p))/(K+C))
         # Generate the nulus
         n = a * b
         # Cloak the totient
@@ -101,10 +98,11 @@ def keygen():
                 good = 1
     return sk, pk, n, p, q, C, K, t, M, a, b, U, V
 
-message = "A"
+message = "Boo"
 msg = number.bytes_to_long(message)
 print msg
 sk, pk, mod, p, q, C, K, t, M, a, b, U, V =  keygen()
+
 print sk, pk, mod, M
 ctxt = encrypt(msg, pk, mod, M)
 print ctxt
@@ -113,6 +111,10 @@ print ptxt
 if ptxt != msg:
     print "Key is broken"
     exit(1)
+#ctxt = 573793408
+#pk = 118548683247652358416567
+#mod = 2021998883
+#M = 1903170901
 
 import math
 crack = int(math.sqrt(math.sqrt(mod)))
