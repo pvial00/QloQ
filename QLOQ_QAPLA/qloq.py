@@ -50,7 +50,7 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 512
+    psize = 1024
     while good != 1:
         # Generate base primes
         p, q, a, b = genBasePrimes(psize)
@@ -59,12 +59,9 @@ def keygen():
         K = (q % p)
         G = (p % q) + (q)
         H = (p % q) + (p)
-        # Cloak the cloaking nulus
-        U = K * G 
-        V = ((C+K)/K) + (((p/q) + (q/p))/(K+C))
-        # Generate the mask
-        M = U * V
-        # Generate the nulus
+        # Generate the cloaking mask
+        M = ((K * G) * (C+K)/K) + (((p/q) + (q/p))/(K+C))
+        # Generate the modulus
         n = a * b
         # Cloak the totient
         t = ((p - 1) * (q - 1) * p * (a - 1) * (b - 1))
