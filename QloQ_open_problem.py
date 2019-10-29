@@ -101,8 +101,7 @@ def keygen():
                 good = 1
     return sk, pk, n, p, q, C, K, t, M, a, b, U, V
 
-#msg = "A"
-message = "Boo"
+message = "A"
 msg = number.bytes_to_long(message)
 print msg
 sk, pk, mod, p, q, C, K, t, M, a, b, U, V =  keygen()
