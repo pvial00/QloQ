@@ -120,7 +120,7 @@ print "crack", crack
 
 primes = []
 masks = []
-ceiling = crack*2
+ceiling = 500000
 start = 2
 inc = 1
 for i in range(start, ceiling, inc):
@@ -187,7 +187,7 @@ print decrypt(ctxt, sk2, mod, M)
 #if tmp == msg:
 #    print "Cracked", tmp
 #    exit(0)
-print "Solve with P,Q,A,B but the question is how to identify P and Q"
+print "Solve with P,Q,A,B but the question is how to identify U"
 ps = ((p - 1) * (q - 1) * p * (a - 1) * (b - 1))
 sk2 = number.inverse(pk, ps)
 print sk2
@@ -252,13 +252,19 @@ print "Finding cloaked prime in the mask with Fermat"
 p2 = fermat(M)
 q2 = M/p2
 print p2, q2
-#q2 = mod / p2
-t = ((p2 - 1) * (q2 - 1) * (a2 - b2))
+# this is just a check, I put the known U in there
+t = ((p2 - 1) * (q2 - 1) * p2 * (a2 - 1) * (U - 1))
 sk2 = number.inverse(pk, t)
 tmp = decrypt(ctxt, sk2, mod, M)
 if tmp == msg:
     print "Cracked", tmp
-    #exit(0)
+    exit(0)
+t = ((p2 - 1) * (q2 - 1) * (a2 - 1) * (U - 1))
+sk2 = number.inverse(pk, t)
+tmp = decrypt(ctxt, sk2, mod, M)
+if tmp == msg:
+    print "Cracked", tmp
+    exit(0)
 print primes
 print masks
 print p, q, a, b, U, V
