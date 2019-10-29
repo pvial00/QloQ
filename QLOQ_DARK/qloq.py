@@ -58,7 +58,6 @@ def keygen():
         C = (p % q)
         K = (q % p)
         G = (p % q) + (q)
-        H = (p % q) + (p)
         # Cloak the cloaking modulus
         U = K * G 
         V = ((C+K)/K) + (((p/q) + (q/p))/(K+C))
