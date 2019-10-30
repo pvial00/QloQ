@@ -1,18 +1,19 @@
-from HoD import encrypt, decrypt
+from qloq import encrypt, decrypt, oaep_encrypt, oaep_decrypt
 from qapla import crypt
 import sys
 from os import urandom
 from Crypto.Util import number
 
-# Made to work with 256 i.e. keys generated from 1024 bit primes
 keylen = 32
 noncelen = 16
-Klen = 256
+Klen = 128
+Ylen = 128
 mode = sys.argv[1]
 infile = sys.argv[2]
 outfile = sys.argv[3]
 key = long(sys.argv[4])
 mod = long(sys.argv[5])
+M = long(sys.argv[6])
 
 if mode == "e":
     f = open(infile, "r")
@@ -21,21 +22,24 @@ if mode == "e":
     keyP = urandom(keylen)
     nonce = urandom(noncelen)
     KP = number.bytes_to_long(keyP)
-    K = number.long_to_bytes(encrypt(number.bytes_to_long(keyP), key, mod))
-    print len(K)
+    X, Y = oaep_encrypt(KP, M)
+    K = encrypt(X, key, mod, M)
+    y = number.long_to_bytes(Y)
+    x = number.long_to_bytes(K)
     ctxt = crypt(msg, keyP, nonce)
     f = open(outfile, "w")
-    f.write(K+nonce+ctxt)
+    f.write(x+y+nonce+ctxt)
     f.close()
 elif mode == "d":
     f = open(infile, "r")
     data = f.read()
     f.close()
-    K = data[:Klen]
-    nonce = data[Klen:Klen+noncelen]
-    msg = data[noncelen+Klen:len(data) - 1]
-    KP = decrypt(number.bytes_to_long(K), key, mod)
-    keyP = number.long_to_bytes(decrypt(number.bytes_to_long(K), key, mod))
+    X = data[:Klen]
+    Y = data[Klen:Ylen+Klen]
+    nonce = data[Klen+Ylen:Klen+Ylen+noncelen]
+    msg = data[Klen+Ylen+noncelen:len(data)]
+    K = decrypt(number.bytes_to_long(X), key, mod, M)
+    keyP = number.long_to_bytes(oaep_decrypt(number.long_to_bytes(K), Y))
     ptxt = crypt(msg, keyP, nonce)
     f = open(outfile, "w")
     f.write(ptxt)
