@@ -84,12 +84,10 @@ def keygen():
 def oaep_encrypt(m, mod):
     # This is for testing purposes only
     n = len(bin(abs(mod))[2:]) 
-    print n
     k0 = 1
     k1 = 0
     ks0 = len(bin(abs(k0))[2:])
     ks1 = len(bin(abs(k1))[2:])
-    #n = n - ks0 - ks1
     r = number.getRandomNBitInteger(n)
     G = number.bytes_to_long(hashlib.sha256(number.long_to_bytes(r)).digest())
     X = m ^ G
