@@ -12,8 +12,8 @@ def decrypt(ctxt, sk, n, M):
     return pow(phase1, sk, M)
 
 def sign(ctxt, sk, n, M):
-    phase1 = pow(ctxt, sk, n)
-    return pow(phase1, sk, M)
+    phase1 = pow(ctxt, sk, M)
+    return pow(phase1, sk, n)
 
 def verify(ptxt, ctxt, pk, n, M):
     phase1 = pow(ptxt, pk, M)
@@ -51,7 +51,7 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 16
+    psize = 512
     while good != 1:
         # Generate base primes
         p, q, a, b = genBasePrimes(psize)
@@ -62,7 +62,7 @@ def keygen():
         # Generate the mask
         M = ((K * G) * (C+K)/K) + (((p/q) + (q/p))/(K+C))
         # Generate the modulus
-        n = a * b * C
+        n = ((C * K) * (C+K)/C) + (((a/b) + (b/a))/(K+C))
         # Cloak the totient
         s = ((p - 1) * (q - 1) * p)
         t = ((a - 1) * (b - 1) * s * a * q)
