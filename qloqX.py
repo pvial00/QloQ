@@ -24,7 +24,7 @@ def verify(ptxt, ctxt, pk, n, M):
         return False
 
 def testencrypt(pk, sk, n, M):
-    msg = "Hello Alice!"
+    msg = "0"
     m = number.bytes_to_long(msg)
     ctxt = encrypt(m, pk, n, M)
     if sk != None:
@@ -51,13 +51,16 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 64
+    psize = 16
     while good != 1:
         # Generate base primes
         p, q, a, b = genBasePrimes(psize)
         C = p % q
+        K = q % p
+        G = (p % q) + (q)
+        H = (p % q) + (p)
         # Generate the mask
-        M = ((((p%q) + (q%p)) * p) * a)
+        M = ((K * G) * (C+K)/K) + (((p/q) + (q/p))/(K+C))
         # Generate the modulus
         n = a * b * C
         # Cloak the totient
