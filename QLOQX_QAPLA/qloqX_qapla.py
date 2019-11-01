@@ -9,9 +9,9 @@ from Crypto.Util import number
 # python qloqX_qaplay.py d <input file> <output file> <secret key file> <public key file>
 keylen = 32
 noncelen = 16
-Klen = 192
-Ylen = 192
-Slen = 192
+Klen = 128
+Ylen = 128
+Slen = 128
 mode = sys.argv[1]
 infile = sys.argv[2]
 outfile = sys.argv[3]
@@ -57,11 +57,11 @@ elif mode == "d":
     x = number.bytes_to_long(X)
     Y = data[Slen+Klen:Slen+Ylen+Klen]
     nonce = data[Slen+Klen+Ylen:Slen+Klen+Ylen+noncelen]
-    msg = data[Klen+Ylen+noncelen:len(data)]
+    msg = data[Slen+Klen+Ylen+noncelen:len(data)]
     K = decrypt(x, qk1.key, qk1.n, qk1.M)
     KP = oaep_decrypt(number.long_to_bytes(K), Y)
     keyP = number.long_to_bytes(KP)
-    if verify(KP, x, qk2.key, qk2.n, qk2.M) == False:
+    if verify(K, x, qk2.key, qk2.n, qk2.M) == False:
         print "Signing verification failed.  Message is not authentic."
         exit(1)
     ptxt = crypt(msg, keyP, nonce)
