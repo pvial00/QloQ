@@ -9,9 +9,10 @@ from Crypto.Util import number
 # python qloqX_qaplay.py d <input file> <output file> <secret key file> <public key file>
 keylen = 32
 noncelen = 16
-Klen = 128
-Ylen = 128
-Slen = 128
+# This made to be used with 1536 bit keys
+Klen = 384
+Ylen = 384
+Slen = 384
 mode = sys.argv[1]
 infile = sys.argv[2]
 outfile = sys.argv[3]

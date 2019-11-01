@@ -12,8 +12,8 @@ def decrypt(ctxt, sk, n, M):
     return pow(phase1, sk, M)
 
 def sign(ctxt, sk, n, M):
-    phase1 = pow(ctxt, sk, M)
-    return pow(phase1, sk, n)
+    phase1 = pow(ctxt, sk, n)
+    return pow(phase1, sk, M)
 
 def verify(ptxt, ctxt, pk, n, M):
     phase1 = pow(ptxt, pk, M)
@@ -24,7 +24,7 @@ def verify(ptxt, ctxt, pk, n, M):
         return False
 
 def testencrypt(pk, sk, n, M):
-    msg = "0"
+    msg = "01234567890ABCDEF"
     m = number.bytes_to_long(msg)
     ctxt = encrypt(m, pk, n, M)
     if sk != None:
@@ -51,7 +51,7 @@ def genBasePrimes(psize):
 
 def keygen():
     good = 0
-    psize = 512
+    psize = 1536
     while good != 1:
         # Generate base primes
         p, q, a, b = genBasePrimes(psize)
