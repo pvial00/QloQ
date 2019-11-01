@@ -5,8 +5,8 @@ from os import urandom
 from Crypto.Util import number
 
 # usage:
-# python qloqX_qaplay.py e <input file> <output file> <public key> <modulus> <mask> <secret key>
-# python qloqX_qaplay.py d <input file> <output file> <secret key> <modulus> <mask> <public key>
+# python qloqX_qaplay.py e <input file> <output file> <public key file> <secret key file>
+# python qloqX_qaplay.py d <input file> <output file> <secret key file> <public key file>
 keylen = 32
 noncelen = 16
 Klen = 192
@@ -15,10 +15,21 @@ Slen = 192
 mode = sys.argv[1]
 infile = sys.argv[2]
 outfile = sys.argv[3]
-key = long(sys.argv[4])
-mod = long(sys.argv[5])
-M = long(sys.argv[6])
-key2 = long(sys.argv[7])
+keyfile = sys.argv[4]
+keyfile2 = sys.argv[5]
+
+class QLOQKeys:
+    def __init__(self, filename):
+        f = open(filename, "r")
+        blob = f.read()
+        f.close()
+        lines = blob.split('\n')
+        self.key = long(lines[0].split(':')[1].strip())
+        self.n = long(lines[1].split(':')[1].strip())
+        self.M = long(lines[2].split(':')[1].strip())
+
+qk1 = QLOQKeys(keyfile)
+qk2 = QLOQKeys(keyfile2)
 
 if mode == "e":
     f = open(infile, "r")
@@ -27,10 +38,9 @@ if mode == "e":
     keyP = urandom(keylen)
     nonce = urandom(noncelen)
     KP = number.bytes_to_long(keyP)
-    print KP
-    X, Y = oaep_encrypt(KP, M)
-    K = encrypt(X, key, mod, M)
-    S = sign(K, key2, mod, M)
+    X, Y = oaep_encrypt(KP, qk1.M)
+    K = encrypt(X, qk1.key, qk1.n, qk1.M)
+    S = sign(K, qk2.key, qk2.n, qk2.M)
     y = number.long_to_bytes(Y)
     x = number.long_to_bytes(K)
     s = number.long_to_bytes(S)
@@ -48,11 +58,10 @@ elif mode == "d":
     Y = data[Slen+Klen:Slen+Ylen+Klen]
     nonce = data[Slen+Klen+Ylen:Slen+Klen+Ylen+noncelen]
     msg = data[Klen+Ylen+noncelen:len(data)]
-    K = decrypt(x, key, mod, M)
+    K = decrypt(x, qk1.key, qk1.n, qk1.M)
     KP = oaep_decrypt(number.long_to_bytes(K), Y)
-    print KP
     keyP = number.long_to_bytes(KP)
-    if verify(KP, x, key2, mod, M) == False:
+    if verify(KP, x, qk2.key, qk2.n, qk2.M) == False:
         print "Signing verification failed.  Message is not authentic."
         exit(1)
     ptxt = crypt(msg, keyP, nonce)
