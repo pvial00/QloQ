@@ -134,7 +134,7 @@ void load_skfile(char *filename, struct qloq_ctx * ctx) {
     int sksize = 4;
     int nsize = 3;
     int Msize = 3;
-    unsigned char *sknum[pksize];
+    unsigned char *sknum[sksize];
     unsigned char *nnum[nsize];
     unsigned char *Mnum[nsize];
     FILE *keyfile;
@@ -155,6 +155,26 @@ void load_skfile(char *filename, struct qloq_ctx * ctx) {
     BN_bin2bn(sk, skn, ctx->sk);
     BN_bin2bn(n, nn, ctx->n);
     BN_bin2bn(M, Mn, ctx->M);
+}
+
+int qloq_encrypt(struct qloq_ctx *ctx, unsigned char *msg, int msglen) {
+    BIGNUM *tmp;
+    BIGNUM *BNctxt;
+    tmp = BN_new();
+    BNctxt = BN_new();
+    BN_bin2bn(msg, msglen, tmp);
+    cloak(ctx, BNctxt, tmp);
+    BN_bn2bin(BNctxt, msg);
+}
+
+int qloq_decrypt(struct qloq_ctx *ctx, unsigned char *ctxt, int msglen) {
+    BIGNUM *tmp;
+    BIGNUM *BNctxt;
+    tmp = BN_new();
+    BNctxt = BN_new();
+    BN_bin2bn(ctxt, msglen, tmp);
+    decloak(ctx, BNctxt, tmp);
+    BN_bn2bin(BNctxt, ctxt);
 }
 
 int keygen(struct qloq_ctx * ctx, int psize) {
