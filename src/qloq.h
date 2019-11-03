@@ -69,7 +69,6 @@ void pkg_keys(struct qloq_ctx * ctx, char * prefix) {
     int skbytes = BN_num_bytes(ctx->sk);
     int nbytes = BN_num_bytes(ctx->n);
     int Mbytes = BN_num_bytes(ctx->M);
-    printf("t\n");
     sprintf(pknum, "%d", pkbytes);
     sprintf(sknum, "%d", skbytes);
     sprintf(nnum, "%d", nbytes);
@@ -82,7 +81,6 @@ void pkg_keys(struct qloq_ctx * ctx, char * prefix) {
     BN_bn2bin(ctx->sk, sk);
     BN_bn2bin(ctx->n, n);
     BN_bn2bin(ctx->M, M);
-    printf("%s\n", pknum);
     tmpfile = fopen(pkfilename, "wb");
     fwrite(pk, 1, strlen(pknum), tmpfile);
     fwrite(pk, 1, pkbytes, tmpfile);
@@ -210,9 +208,7 @@ int keygen(struct qloq_ctx * ctx, int psize) {
 
             RAND_seed(seed, 524288);
             randstat = RAND_status();
-            printf("%d\n", randstat);
         }
-        printf("start\n");
         BN_rand(p, psize, 0, 0);
         BN_generate_prime_ex(p, psize, 1, NULL, NULL, NULL);
         while ((BN_is_prime_ex(p, BN_prime_checks, NULL, NULL) != 1)) {
@@ -221,7 +217,6 @@ int keygen(struct qloq_ctx * ctx, int psize) {
         }
         char *pdec;
         BN_bn2dec(p);
-        printf("%s\n", pdec);
         BN_rand(q, psize, 0, 0);
         BN_generate_prime_ex(q, psize, 1, NULL, NULL, NULL);
         while ((BN_cmp(p, q) == 0) && (BN_is_prime_ex(q, BN_prime_checks, NULL, NULL) != 1)) {
@@ -230,7 +225,6 @@ int keygen(struct qloq_ctx * ctx, int psize) {
         }
         char *qdec;
         BN_bn2dec(q);
-        printf("%s\n", qdec);
         BN_rand(a, psize, 0, 0);
         BN_generate_prime_ex(a, psize, 1, NULL, NULL, NULL);
         while ((BN_cmp(a, q) == 0) && (BN_cmp(a, p) == 0)) {
@@ -247,7 +241,6 @@ int keygen(struct qloq_ctx * ctx, int psize) {
         BN_mod(C, p, q, bnctx);
         BN_mod(K, q, p, bnctx);
         BN_add(G, q, C);
-        printf("Cloak params\n");
         /* Generate the modulus */
         BN_div(tmp0, rtmp, a, b, bnctx);
         BN_div(tmp1, rtmp, b, q, bnctx);
@@ -258,7 +251,6 @@ int keygen(struct qloq_ctx * ctx, int psize) {
         BN_div(tmp1, rtmp, tmp0, C, bnctx);
         BN_mul(tmp2, tmp0, tmp1, bnctx);
         BN_add(ctx->n, tmp2, tmp4);
-        printf("Mod\n");
         /* Generate the mask */
         BN_div(tmp0, rtmp, p, q, bnctx);
         BN_div(tmp1, rtmp, q, p, bnctx);
@@ -269,7 +261,6 @@ int keygen(struct qloq_ctx * ctx, int psize) {
         BN_div(tmp1, rtmp, tmp0, K, bnctx);
         BN_mul(tmp2, tmp0, tmp1, bnctx);
         BN_add(ctx->M, tmp2, tmp4);
-        printf("Mask\n");
         /* Build the totient */
         BN_sub(tmp0, p, z1);
         BN_sub(tmp1, q, z1);
@@ -281,7 +272,6 @@ int keygen(struct qloq_ctx * ctx, int psize) {
         BN_mul(tmp3, tmp2 , s, bnctx);
         BN_mul(tmp4, tmp3 , a, bnctx);
         BN_mul(t, tmp4 , q, bnctx);
-        printf("T\n");
         /* Generate the public key */
         BN_rand_range(ctx->pk, t);
         BN_gcd(tmp0, ctx->pk, t, bnctx);
@@ -289,14 +279,11 @@ int keygen(struct qloq_ctx * ctx, int psize) {
             BN_rand_range(ctx->pk, t);
             BN_gcd(tmp0, ctx->pk, t, bnctx);
         }
-        printf("PK\n");
         BN_mod_inverse(ctx->sk, ctx->pk, t, bnctx);
-        printf("SK\n");
         cloak(ctx, ctxt, z1);
         decloak(ctx, ptxt, ctxt);
         if ((BN_cmp(ptxt, z1) == 0)) {
             good = 1;
-            printf("Key is good\n");
         }
     }
     pkg_keys(ctx, prefix);
