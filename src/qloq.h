@@ -165,6 +165,7 @@ int qloq_encrypt(struct qloq_ctx *ctx, unsigned char *msg, int msglen) {
     BN_bin2bn(msg, msglen, tmp);
     cloak(ctx, BNctxt, tmp);
     BN_bn2bin(BNctxt, msg);
+    int pkbytes = BN_num_bytes(ctx->pk);
 }
 
 int qloq_decrypt(struct qloq_ctx *ctx, unsigned char *ctxt, int msglen) {
@@ -178,7 +179,7 @@ int qloq_decrypt(struct qloq_ctx *ctx, unsigned char *ctxt, int msglen) {
 }
 
 int keygen(struct qloq_ctx * ctx, int psize) {
-    unsigned char *prefix = "QloQ";
+    char *prefix = "QloQ";
     BN_CTX *bnctx = BN_CTX_new();
     int good = 0;
     int randstat = 0;
@@ -202,7 +203,8 @@ int keygen(struct qloq_ctx * ctx, int psize) {
     BIGNUM *tmp2;
     BIGNUM *tmp3;
     BIGNUM *tmp4;
-    BIGNUM *rtmp;
+    BIGNUM *rtmp0;
+    BIGNUM *rtmp1;
     BIGNUM *ptxt;
     BIGNUM *ctxt;
     BIGNUM *z1;
@@ -220,7 +222,8 @@ int keygen(struct qloq_ctx * ctx, int psize) {
     tmp2 = BN_new();
     tmp3 = BN_new();
     tmp4 = BN_new();
-    rtmp = BN_new();
+    rtmp0 = BN_new();
+    rtmp1 = BN_new();
     ctxt = BN_new();
     ptxt = BN_new();
     z1 = BN_new();
@@ -264,30 +267,37 @@ int keygen(struct qloq_ctx * ctx, int psize) {
             BN_rand(b, psize, 0, 0);
             BN_generate_prime_ex(b, psize, 1, NULL, NULL, NULL);
         }
+        // Uncomment to test
+        //BN_set_word(p, 137);
+        //BN_set_word(q, 179);
+        //BN_set_word(a, 173);
+        //BN_set_word(b, 181);
         /* Generate cloaking parameters */
         BN_mod(C, p, q, bnctx);
         BN_mod(K, q, p, bnctx);
         BN_add(G, q, C);
         /* Generate the modulus */
-        BN_div(tmp0, rtmp, a, b, bnctx);
-        BN_div(tmp1, rtmp, b, q, bnctx);
-        BN_add(tmp2, tmp0, tmp1);
-        BN_add(tmp3, K, C);
-        BN_div(tmp4, rtmp, tmp2, tmp3, bnctx);
         BN_mul(tmp0, C, K, bnctx);
-        BN_div(tmp1, rtmp, tmp0, C, bnctx);
-        BN_mul(tmp2, tmp0, tmp1, bnctx);
-        BN_add(ctx->n, tmp2, tmp4);
-        /* Generate the mask */
-        BN_div(tmp0, rtmp, p, q, bnctx);
-        BN_div(tmp1, rtmp, q, p, bnctx);
+        BN_add(tmp1, K, C);
+        BN_mul(tmp3, tmp0, tmp1, bnctx);
+        BN_div(tmp4, rtmp0, tmp3, C, bnctx);
+        BN_div(tmp0, rtmp0, a, b, bnctx);
+        BN_div(tmp1, rtmp0, b, a, bnctx);
         BN_add(tmp2, tmp0, tmp1);
         BN_add(tmp3, K, C);
-        BN_div(tmp4, rtmp, tmp2, tmp3, bnctx);
+        BN_div(tmp0, rtmp0, tmp2, tmp3, bnctx);
+        BN_add(ctx->n, tmp0, tmp4);
+        /* Generate the mask */
         BN_mul(tmp0, K, G, bnctx);
-        BN_div(tmp1, rtmp, tmp0, K, bnctx);
-        BN_mul(tmp2, tmp0, tmp1, bnctx);
-        BN_add(ctx->M, tmp2, tmp4);
+        BN_add(tmp1, K, C);
+        BN_mul(tmp3, tmp0, tmp1, bnctx);
+        BN_div(tmp4, rtmp0, tmp3, K, bnctx);
+        BN_div(tmp0, rtmp0, p, q, bnctx);
+        BN_div(tmp1, rtmp0, q, p, bnctx);
+        BN_add(tmp2, tmp0, tmp1);
+        BN_add(tmp3, K, C);
+        BN_div(tmp0, rtmp0, tmp2, tmp3, bnctx);
+        BN_add(ctx->M, tmp0, tmp4);
         /* Build the totient */
         BN_sub(tmp0, p, z1);
         BN_sub(tmp1, q, z1);
@@ -307,9 +317,10 @@ int keygen(struct qloq_ctx * ctx, int psize) {
             BN_gcd(tmp0, ctx->pk, t, bnctx);
         }
         BN_mod_inverse(ctx->sk, ctx->pk, t, bnctx);
-        cloak(ctx, ctxt, z1);
+        BN_set_word(tmp0, 65);
+        cloak(ctx, ctxt, tmp0);
         decloak(ctx, ptxt, ctxt);
-        if ((BN_cmp(ptxt, z1) == 0)) {
+        if ((BN_cmp(ptxt, tmp0) == 0)) {
             good = 1;
         }
     }
@@ -328,7 +339,8 @@ int keygen(struct qloq_ctx * ctx, int psize) {
     BN_free(tmp2);
     BN_free(tmp3);
     BN_free(tmp4);
-    BN_free(rtmp);
+    BN_free(rtmp0);
+    BN_free(rtmp1);
     BN_free(ctxt);
     BN_free(ptxt);
     BN_free(z1);
