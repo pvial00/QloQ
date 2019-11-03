@@ -54,12 +54,10 @@ int verify(struct qloq_ctx * ctx, BIGNUM *ctxt, BIGNUM *ptxt) {
 void pkg_keys(struct qloq_ctx * ctx, char * prefix) {
     char *pkfilename[256];
     char *skfilename[256];
-    char *pknum[8];
-    char *sknum[8];
-    char *nnum[8];
-    char *Mnum[8];
-    char *newline = "\n";
-    char *sep = ":";
+    char *pknum[4];
+    char *sknum[4];
+    char *nnum[3];
+    char *Mnum[3];
     FILE *tmpfile;
     strcpy(pkfilename, prefix);
     strcat(pkfilename, ".pk");
@@ -82,7 +80,7 @@ void pkg_keys(struct qloq_ctx * ctx, char * prefix) {
     BN_bn2bin(ctx->n, n);
     BN_bn2bin(ctx->M, M);
     tmpfile = fopen(pkfilename, "wb");
-    fwrite(pk, 1, strlen(pknum), tmpfile);
+    fwrite(pknum, 1, strlen(pknum), tmpfile);
     fwrite(pk, 1, pkbytes, tmpfile);
     fwrite(nnum, 1, strlen(nnum), tmpfile);
     fwrite(n, 1, nbytes, tmpfile);
@@ -100,53 +98,64 @@ void pkg_keys(struct qloq_ctx * ctx, char * prefix) {
 }
 
 void load_pkfile(char *filename, struct qloq_ctx * ctx) {
-    unsigned char *pk;
-    unsigned char *n;
-    unsigned char *M;
-    char *pknum[4];
-    char *nnum[3];
-    char *Mnum[3];
+    ctx->pk = BN_new();
+    ctx->n = BN_new();
+    ctx->M = BN_new();
+    int pksize = 4;
+    int nsize = 3;
+    int Msize = 3;
+    unsigned char *pknum[pksize];
+    unsigned char *nnum[nsize];
+    unsigned char *Mnum[nsize];
     FILE *keyfile;
-    keyfile = open(filename, "rb");
-    fread(pknum, 1, 4, keyfile);
+    keyfile = fopen(filename, "rb");
+    fread(&pknum, 1, pksize, keyfile);
     int pkn = atoi(pknum);
-    fread(pk, 1, pkn, keyfile);
-    fread(nnum, 1, 3, keyfile);
+    unsigned char pk[pkn];
+    fread(&pk, 1, pkn, keyfile);
+    fread(nnum, 1, nsize, keyfile);
     int nn = atoi(nnum);
-    fread(n, 1, nn, keyfile);
-    fread(Mnum, 1, 3, keyfile);
+    unsigned char n[nn];
+    fread(&n, 1, nn, keyfile);
+    fread(Mnum, 1, Msize, keyfile);
     int Mn = atoi(Mnum);
-    fread(M, 1, Mn, keyfile);
+    unsigned char M[Mn];
+    fread(&M, 1, Mn, keyfile);
     fclose(keyfile);
     BN_bin2bn(pk, pkn, ctx->pk);
     BN_bin2bn(n, nn, ctx->n);
     BN_bin2bn(M, Mn, ctx->M);
 }
 
-void load_skfile(char * filename, struct qloq_ctx * ctx) {
-    unsigned char *sk;
-    unsigned char *n;
-    unsigned char *M;
-    char *sknum[4];
-    char *nnum[3];
-    char *Mnum[3];
+void load_skfile(char *filename, struct qloq_ctx * ctx) {
+    ctx->sk = BN_new();
+    ctx->n = BN_new();
+    ctx->M = BN_new();
+    int sksize = 4;
+    int nsize = 3;
+    int Msize = 3;
+    unsigned char *sknum[pksize];
+    unsigned char *nnum[nsize];
+    unsigned char *Mnum[nsize];
     FILE *keyfile;
-    keyfile = open(filename, "rb");
-    fread(sknum, 1, 4, keyfile);
+    keyfile = fopen(filename, "rb");
+    fread(&sknum, 1, sksize, keyfile);
     int skn = atoi(sknum);
-    fread(sk, 1, skn, keyfile);
-    fread(nnum, 1, 3, keyfile);
+    unsigned char sk[skn];
+    fread(&sk, 1, skn, keyfile);
+    fread(nnum, 1, nsize, keyfile);
     int nn = atoi(nnum);
-    fread(n, 1, nn, keyfile);
-    fread(Mnum, 1, 3, keyfile);
+    unsigned char n[nn];
+    fread(&n, 1, nn, keyfile);
+    fread(Mnum, 1, Msize, keyfile);
     int Mn = atoi(Mnum);
-    fread(M, 1, Mn, keyfile);
+    unsigned char M[Mn];
+    fread(&M, 1, Mn, keyfile);
     fclose(keyfile);
     BN_bin2bn(sk, skn, ctx->sk);
     BN_bin2bn(n, nn, ctx->n);
     BN_bin2bn(M, Mn, ctx->M);
 }
-
 
 int keygen(struct qloq_ctx * ctx, int psize) {
     unsigned char *prefix = "QloQ";
@@ -216,7 +225,6 @@ int keygen(struct qloq_ctx * ctx, int psize) {
             BN_generate_prime_ex(p, psize, 1, NULL, NULL, NULL);
         }
         char *pdec;
-        BN_bn2dec(p);
         BN_rand(q, psize, 0, 0);
         BN_generate_prime_ex(q, psize, 1, NULL, NULL, NULL);
         while ((BN_cmp(p, q) == 0) && (BN_is_prime_ex(q, BN_prime_checks, NULL, NULL) != 1)) {
@@ -224,7 +232,6 @@ int keygen(struct qloq_ctx * ctx, int psize) {
             BN_generate_prime_ex(q, psize, 1, NULL, NULL, NULL);
         }
         char *qdec;
-        BN_bn2dec(q);
         BN_rand(a, psize, 0, 0);
         BN_generate_prime_ex(a, psize, 1, NULL, NULL, NULL);
         while ((BN_cmp(a, q) == 0) && (BN_cmp(a, p) == 0)) {
