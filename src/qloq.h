@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <openssl/bn.h>
+#include "../hash/ganja.c"
 
 struct qloq_ctx {
     BIGNUM *sk;
@@ -157,25 +158,18 @@ void load_skfile(char *filename, struct qloq_ctx * ctx) {
     BN_bin2bn(M, Mn, ctx->M);
 }
 
-int qloq_encrypt(struct qloq_ctx *ctx, unsigned char *msg, int msglen) {
-    BIGNUM *tmp;
-    BIGNUM *BNctxt;
-    tmp = BN_new();
-    BNctxt = BN_new();
-    BN_bin2bn(msg, msglen, tmp);
-    cloak(ctx, BNctxt, tmp);
-    BN_bn2bin(BNctxt, msg);
-    int pkbytes = BN_num_bytes(ctx->pk);
+void * mypad_encrypt(unsigned char * msg, int msglen, unsigned char * X, int mask_bytes, unsigned char *nonce) {
+    unsigned char tmp[mask_bytes];
+    memcpy(tmp, msg, msglen);
+    for (int i = 0; i < mask_bytes; i++) {
+        X[i] = tmp[i] ^ nonce[i];
+    }
 }
 
-int qloq_decrypt(struct qloq_ctx *ctx, unsigned char *ctxt, int msglen) {
-    BIGNUM *tmp;
-    BIGNUM *BNctxt;
-    tmp = BN_new();
-    BNctxt = BN_new();
-    BN_bin2bn(ctxt, msglen, tmp);
-    decloak(ctx, BNctxt, tmp);
-    BN_bn2bin(BNctxt, ctxt);
+void * mypad_decrypt(unsigned char * msg, unsigned char * X, int mask_bytes, unsigned char *nonce) {
+    for (int i = 0; i < mask_bytes; i++) {
+        msg[i] = X[i] ^ nonce[i];
+    }
 }
 
 int keygen(struct qloq_ctx * ctx, int psize) {
