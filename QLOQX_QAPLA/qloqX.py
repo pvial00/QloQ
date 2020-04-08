@@ -63,6 +63,8 @@ def keygen():
         M = ((K * G) * (C+K)/K) + (((p/q) + (q/p))/(K+C))
         # Generate the modulus
         n = ((C * K) * (C+K)/C) + (((a/b) + (b/a))/(K+C))
+        while number.isPrime(n):
+            n += 1
         # Cloak the totient
         s = ((p - 1) * (q - 1) * p)
         t = ((a - 1) * (b - 1) * s * a * q)
